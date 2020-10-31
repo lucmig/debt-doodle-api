@@ -14,5 +14,7 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+.vscode
+
 debt-doodle-api
 __debug_bin

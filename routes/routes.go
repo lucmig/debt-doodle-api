@@ -18,7 +18,7 @@ func Routes(router *gin.Engine) {
 	router.DELETE("/debts/:debtId", api.DeleteDebt)
 
 	router.PUT("/debts/:debtId/samples", api.UpdateSample)
-	router.DELETE("/debts/:debtId/samples/:timestamp", api.DeleteSample)
+	router.DELETE("/debts/:debtId/samples/:date", api.DeleteSample)
 
 	router.NoRoute(notFound)
 }

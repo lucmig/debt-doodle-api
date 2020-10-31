@@ -13,8 +13,8 @@ import (
 
 // Sample - debt sample point
 type Sample struct {
-	Timestamp time.Time `json:"timestamp"`
-	Value     float32   `json:"value"`
+	Date  string  `json:"date" time_format:"2006-01-02" time_utc:"1"`
+	Value float32 `json:"value"`
 }
 
 // Debt - a debt
@@ -176,15 +176,15 @@ func UpdateSample(c *gin.Context) {
 	oldData := bson.M{
 		"$pull": bson.M{
 			"samples": bson.M{
-				"timestamp": sample.Timestamp,
+				"date": sample.Date,
 			},
 		},
 	}
 
 	samples := []Sample{
-		Sample{
-			Timestamp: sample.Timestamp,
-			Value:     sample.Value,
+		{
+			Date:  sample.Date,
+			Value: sample.Value,
 		},
 	}
 
@@ -193,7 +193,7 @@ func UpdateSample(c *gin.Context) {
 			"samples": bson.M{
 				"$each": samples,
 				"$sort": bson.M{
-					"timestamp": -1,
+					"date": -1,
 				},
 			},
 		},
@@ -229,12 +229,21 @@ func UpdateSample(c *gin.Context) {
 // DeleteSample - delete debt sample point
 func DeleteSample(c *gin.Context) {
 	debtID := c.Param("debtId")
-	timestamp, _ := time.Parse(time.RFC3339, c.Param("timestamp"))
+	layout := "2006-01-02"
+	sampleDate, err := time.Parse(layout, c.Param("date"))
+	if err != nil {
+		log.Printf("Error, Reason: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  500,
+			"message": err,
+		})
+		return
+	}
 
 	data := bson.M{
 		"$pull": bson.M{
 			"samples": bson.M{
-				"timestamp": timestamp,
+				"date": sampleDate.Format("2006-01-02"),
 			},
 		},
 	}
