@@ -18,3 +18,4 @@
 
 debt-doodle-api
 __debug_bin
+*.mongodb

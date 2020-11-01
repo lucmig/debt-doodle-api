@@ -26,6 +26,12 @@ type Debt struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+// DebtValue - a debt value
+type DebtValue struct {
+	ID    string `bson:"_id" json:"_id,omitempty"`
+	Value float32
+}
+
 // database instance
 var collection *mongo.Collection
 
@@ -108,11 +114,7 @@ func GetDebt(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  http.StatusOK,
-		"message": "Single Debt",
-		"data":    debt,
-	})
+	c.JSON(http.StatusOK, debt)
 	return
 }
 
@@ -262,5 +264,60 @@ func DeleteSample(c *gin.Context) {
 		"status":  200,
 		"message": res,
 	})
+	return
+}
+
+// GetDebtsDate - get debts at a date
+func GetDebtsDate(c *gin.Context) {
+	date := c.Param("date")
+
+	debtValues := []DebtValue{}
+	matchStage := bson.D{
+		{Key: "$match", Value: bson.D{
+			{Key: "samples.date", Value: bson.D{
+				{Key: "$lte", Value: date},
+			}},
+		}},
+	}
+	setStage := bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "value", Value: bson.D{
+				{Key: "$max", Value: bson.D{
+					{Key: "$filter", Value: bson.D{
+						{Key: "input", Value: "$samples"},
+						{Key: "as", Value: "smp"},
+						{Key: "cond", Value: bson.D{
+							{Key: "$lte", Value: bson.A{"$$smp.date", date}},
+						}},
+					}},
+				}},
+			}},
+		}},
+	}
+	projectStage := bson.D{
+		{Key: "$project", Value: bson.D{
+			{Key: "value", Value: "$value.value"},
+		}},
+	}
+
+	cursor, err := collection.Aggregate(context.TODO(), mongo.Pipeline{matchStage, setStage, projectStage})
+
+	if err != nil {
+		log.Printf("Error while getting all debts, Reason: %v\n", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  http.StatusInternalServerError,
+			"message": "Something went wrong",
+		})
+		return
+	}
+
+	// Iterate through the returned cursor.
+	for cursor.Next(context.TODO()) {
+		var debt DebtValue
+		cursor.Decode(&debt)
+		debtValues = append(debtValues, debt)
+	}
+
+	c.JSON(http.StatusOK, debtValues)
 	return
 }
