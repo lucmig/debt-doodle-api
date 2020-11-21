@@ -1,0 +1,125 @@
+{
+  "consumes": [
+    "application/json",
+    "application/xml"
+  ],
+  "produces": [
+    "application/json",
+    "application/xml"
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "the purpose of this application is to provide an application\nthat is using plain go code to define an API\n\nThis should demonstrate all the possible comment annotations\nthat are available to turn go code into a fully compliant swagger 2.0 spec",
+    "title": "Petstore API.",
+    "termsOfService": "there are no TOS at this moment, use at your own risk we take no responsibility",
+    "contact": {
+      "name": "Miguel Santos",
+      "url": "http://migsan.com",
+      "email": "mig@migsan.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    },
+    "version": "0.0.1"
+  },
+  "host": "localhost:9000",
+  "paths": {
+    "/debts": {
+      "get": {
+        "security": [
+          {
+            "api_key": []
+          },
+          {
+            "oauth": [
+              "read",
+              "write"
+            ]
+          }
+        ],
+        "description": "Return all debts.",
+        "consumes": [
+          "application/json",
+          "application/x-protobuf"
+        ],
+        "produces": [
+          "application/json",
+          "application/x-protobuf"
+        ],
+        "schemes": [
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ],
+        "summary": "Lists debts",
+        "operationId": "debts",
+        "responses": {
+          "200": {},
+          "204": {},
+          "400": {}
+        }
+      }
+    }
+  },
+  "responses": {
+    "validationError": {
+      "description": "A ValidationError is an error that is used when the required input fails validation.",
+      "schema": {
+        "type": "object",
+        "required": [
+          "Message"
+        ],
+        "properties": {
+          "FieldName": {
+            "description": "An optional field name to which this validation applies",
+            "type": "string"
+          },
+          "Message": {
+            "description": "The validation message",
+            "type": "string",
+            "example": "Expected type int"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "KEY",
+      "in": "header"
+    },
+    "oauth2": {
+      "type": "oauth2",
+      "in": "header",
+      "flow": "accessCode",
+      "authorizationUrl": "/oauth2/auth",
+      "tokenUrl": "/oauth2/token",
+      "scopes": {
+        "bar": "foo"
+      }
+    }
+  },
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
+  "x-meta-array": [
+    "value1",
+    "value2"
+  ],
+  "x-meta-array-obj": [
+    {
+      "name": "obj",
+      "value": "field"
+    }
+  ],
+  "x-meta-value": "value"
+}

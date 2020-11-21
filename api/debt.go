@@ -17,8 +17,39 @@ type Sample struct {
 	Value float32 `json:"value"`
 }
 
-// Debt - a debt
+//Debt Json request payload is as follows,
+//{
+//  "_id": "1",
+//  "description": "Blue Credit Card",
+//  "samples": [],
+//  "created_at": "2020-04-01T00:00:00Z",
+//  "updated_at": "2020-04-01T00:00:00Z"
+//}
+
+// A ValidationError is an error that is used when the required input fails validation.
+// swagger:response validationError
+type ValidationError struct {
+	// The error message
+	// in: body
+	Body struct {
+		// The validation message
+		//
+		// Required: true
+		// Example: Expected type int
+		Message string
+		// An optional field name to which this validation applies
+		FieldName string
+	}
+}
+
+// Debt is a debt item
+//
+// A debt
+//
+// swagger:model
 type Debt struct {
+	// Required: true
+	// Example: Expected type string
 	ID          string    `bson:"_id" json:"_id,omitempty"`
 	Description string    `json:"description"`
 	Samples     []Sample  `json:"samples"`
@@ -267,8 +298,8 @@ func DeleteSample(c *gin.Context) {
 	return
 }
 
-// GetDebtsDate - get debts at a date
-func GetDebtsDate(c *gin.Context) {
+// GetValuesDate - get debts value at a date
+func GetValuesDate(c *gin.Context) {
 	date := c.Param("date")
 
 	debtValues := []DebtValue{}
