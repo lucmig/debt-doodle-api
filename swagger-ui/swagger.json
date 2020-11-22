@@ -57,13 +57,86 @@
           "ws",
           "wss"
         ],
+        "tags": [
+          "debts"
+        ],
         "summary": "Lists debts",
-        "operationId": "debts",
+        "operationId": "GetAllDebts",
         "responses": {
           "200": {},
           "204": {},
           "400": {}
         }
+      },
+      "post": {
+        "description": "Add a debt",
+        "consumes": [
+          "application/json",
+          "application/x-protobuf"
+        ],
+        "produces": [
+          "application/json",
+          "application/x-protobuf"
+        ],
+        "schemes": [
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ],
+        "tags": [
+          "debts"
+        ],
+        "summary": "Adds a debt",
+        "operationId": "AddDebt",
+        "responses": {
+          "200": {},
+          "400": {}
+        }
+      }
+    },
+    "/debts/:debtId": {
+      "get": {
+        "tags": [
+          "debts"
+        ],
+        "operationId": "GetDebt"
+      },
+      "put": {
+        "tags": [
+          "debts"
+        ],
+        "operationId": "EditDebt"
+      },
+      "delete": {
+        "tags": [
+          "debts"
+        ],
+        "operationId": "DeleteDebt"
+      }
+    },
+    "/debts/:debtId/samples": {
+      "put": {
+        "tags": [
+          "samples"
+        ],
+        "operationId": "UpdateSample"
+      }
+    },
+    "/debts/:debtId/samples/:date": {
+      "delete": {
+        "tags": [
+          "samples"
+        ],
+        "operationId": "DeleteSample"
+      }
+    },
+    "/values/:date": {
+      "get": {
+        "tags": [
+          "values"
+        ],
+        "operationId": "GetValuesDate"
       }
     }
   },
