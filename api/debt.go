@@ -46,8 +46,9 @@ type ValidationError struct {
 //
 // A debt
 //
-// swagger:model
+// swagger:parameters AddDebt
 type Debt struct {
+	// in:body
 	// Required: true
 	// Example: Expected type string
 	ID          string    `bson:"_id" json:"_id,omitempty"`

@@ -89,6 +89,47 @@
         ],
         "summary": "Adds a debt",
         "operationId": "AddDebt",
+        "parameters": [
+          {
+            "example": "Expected type string",
+            "x-go-name": "ID",
+            "name": "_id",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "type": "string",
+            "x-go-name": "Description",
+            "name": "description",
+            "in": "query"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Sample"
+            },
+            "x-go-name": "Samples",
+            "name": "samples",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "CreatedAt",
+            "name": "created_at",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date-time",
+            "x-go-name": "UpdatedAt",
+            "name": "updated_at",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {},
           "400": {}
@@ -138,6 +179,24 @@
         ],
         "operationId": "GetValuesDate"
       }
+    }
+  },
+  "definitions": {
+    "Sample": {
+      "description": "Sample - debt sample point",
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "x-go-name": "Date"
+        },
+        "value": {
+          "type": "number",
+          "format": "float",
+          "x-go-name": "Value"
+        }
+      },
+      "x-go-package": "github.com/lucmig/debt-doodle-api/api"
     }
   },
   "responses": {
