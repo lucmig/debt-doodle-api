@@ -102,8 +102,8 @@ func Routes(router *gin.Engine) {
 	// swagger:route DELETE /debts/:debtId/samples/:date samples DeleteSample
 	router.DELETE("/debts/:debtId/samples/:date", api.DeleteSample)
 
-	// swagger:route GET /values/:date values GetValuesDate
-	router.GET("/values/:date", api.GetValuesDate)
+	// swagger:route GET /values/:start/:end/:interval values GetValues
+	router.GET("/values", api.GetValues)
 
 	router.Use(static.Serve("/", static.LocalFile("./swagger-ui", false)))
 

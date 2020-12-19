@@ -60,8 +60,9 @@ type Debt struct {
 
 // DebtValue - a debt value
 type DebtValue struct {
-	ID    string `bson:"_id" json:"_id,omitempty"`
-	Value float32
+	ID    string    `bson:"_id" json:"_id,omitempty"`
+	Date  time.Time `json:"date" time_format:"2006-01-02" time_utc:"1"`
+	Value float32   `json:"value"`
 }
 
 // database instance
@@ -263,8 +264,7 @@ func UpdateSample(c *gin.Context) {
 // DeleteSample - delete debt sample point
 func DeleteSample(c *gin.Context) {
 	debtID := c.Param("debtId")
-	layout := "2006-01-02"
-	sampleDate, err := time.Parse(layout, c.Param("date"))
+	sampleDate, err := time.Parse("2006-01-02", c.Param("date"))
 	if err != nil {
 		log.Printf("Error, Reason: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -299,11 +299,10 @@ func DeleteSample(c *gin.Context) {
 	return
 }
 
-// GetValuesDate - get debts value at a date
-func GetValuesDate(c *gin.Context) {
-	date := c.Param("date")
-
+func getDateValues(date string) []DebtValue {
 	debtValues := []DebtValue{}
+	debtDate, _ := time.Parse("2006-01-02", date)
+
 	matchStage := bson.D{
 		{Key: "$match", Value: bson.D{
 			{Key: "samples.date", Value: bson.D{
@@ -336,20 +335,47 @@ func GetValuesDate(c *gin.Context) {
 
 	if err != nil {
 		log.Printf("Error while getting all debts, Reason: %v\n", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  http.StatusInternalServerError,
-			"message": "Something went wrong",
-		})
-		return
+		// c.JSON(http.StatusInternalServerError, gin.H{
+		// 	"status":  http.StatusInternalServerError,
+		// 	"message": "Something went wrong",
+		// })
+		return []DebtValue{}
 	}
 
 	// Iterate through the returned cursor.
 	for cursor.Next(context.TODO()) {
 		var debt DebtValue
 		cursor.Decode(&debt)
+		debt.Date = debtDate
 		debtValues = append(debtValues, debt)
 	}
 
+	return debtValues
+}
+
+// GetValues - get debt values
+func GetValues(c *gin.Context) {
+	today := time.Now().Format("2006-01-02")
+
+	date := c.DefaultQuery("date", today)
+
+	from := c.Query("from")
+	to := c.DefaultQuery("to", today)
+	interval := c.DefaultQuery("interval", "month")
+
+	if from != "" {
+
+	}
+
+	if to != "" {
+
+	}
+
+	if interval != "" {
+
+	}
+
+	debtValues := getDateValues(date)
 	c.JSON(http.StatusOK, debtValues)
 	return
 }
