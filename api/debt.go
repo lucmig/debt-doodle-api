@@ -60,9 +60,14 @@ type Debt struct {
 
 // DebtValue - a debt value
 type DebtValue struct {
-	ID    string    `bson:"_id" json:"_id,omitempty"`
-	Date  time.Time `json:"date" time_format:"2006-01-02" time_utc:"1"`
-	Value float32   `json:"value"`
+	ID    string  `bson:"_id" json:"id,omitempty"`
+	Value float32 `json:"value"`
+}
+
+// DebtValueResult - a debt value result
+type DebtValueResult struct {
+	Date       time.Time   `json:"date" time_format:"2006-01-02" time_utc:"1"`
+	DebtValues []DebtValue `json:"values"`
 }
 
 // database instance
@@ -299,8 +304,7 @@ func DeleteSample(c *gin.Context) {
 	return
 }
 
-func getDateValues(date string) []DebtValue {
-	debtValues := []DebtValue{}
+func getDateValues(date string) DebtValueResult {
 	debtDate, _ := time.Parse("2006-01-02", date)
 
 	matchStage := bson.D{
@@ -339,18 +343,45 @@ func getDateValues(date string) []DebtValue {
 		// 	"status":  http.StatusInternalServerError,
 		// 	"message": "Something went wrong",
 		// })
-		return []DebtValue{}
+		return DebtValueResult{}
 	}
 
+	var debtValueResult DebtValueResult
+	debtValueResult.Date = debtDate
 	// Iterate through the returned cursor.
 	for cursor.Next(context.TODO()) {
-		var debt DebtValue
-		cursor.Decode(&debt)
-		debt.Date = debtDate
-		debtValues = append(debtValues, debt)
+		var debtVal DebtValue
+		cursor.Decode(&debtVal)
+		debtValueResult.DebtValues = append(debtValueResult.DebtValues, debtVal)
 	}
 
-	return debtValues
+	return debtValueResult
+}
+
+func getMultipleDateValues(from string, to string, interval string) []DebtValueResult {
+	fromDate, _ := time.Parse("2006-01-02", from)
+	toDate, _ := time.Parse("2006-01-02", to)
+
+	sampleDate := fromDate
+	var result []DebtValueResult
+	for !sampleDate.After(toDate) {
+		values := getDateValues(sampleDate.Format("2006-01-02"))
+		if len(values.DebtValues) != 0 {
+			result = append(result, values)
+		}
+		switch interval {
+		case "week":
+			sampleDate = sampleDate.AddDate(0, 0, 7)
+		case "quarter":
+			sampleDate = sampleDate.AddDate(0, 3, 0)
+		case "year":
+			sampleDate = sampleDate.AddDate(1, 0, 0)
+		default:
+			sampleDate = sampleDate.AddDate(0, 1, 0)
+		}
+	}
+
+	return result
 }
 
 // GetValues - get debt values
@@ -363,19 +394,13 @@ func GetValues(c *gin.Context) {
 	to := c.DefaultQuery("to", today)
 	interval := c.DefaultQuery("interval", "month")
 
+	var debtValues []DebtValueResult
 	if from != "" {
-
+		debtValues = getMultipleDateValues(from, to, interval)
+	} else {
+		debtValues = []DebtValueResult{getDateValues(date)}
 	}
 
-	if to != "" {
-
-	}
-
-	if interval != "" {
-
-	}
-
-	debtValues := getDateValues(date)
 	c.JSON(http.StatusOK, debtValues)
 	return
 }
